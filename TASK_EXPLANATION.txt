@@ -1,0 +1,197 @@
+==============================================================================
+  TASK EXPLANATION — GEOGRAPHIC ANALYSIS OF RESTAURANT LOCATIONS
+  Data Analytics Internship Project
+==============================================================================
+
+------------------------------------------------------------------------------
+WHAT IS THE TASK?
+------------------------------------------------------------------------------
+
+The task is to perform a geographic analysis on a dataset of restaurants. The
+two core objectives are:
+
+  1. Plot the locations of restaurants on a map using their longitude and
+     latitude coordinates so that the global spread of establishments is
+     clearly visible.
+
+  2. Identify any spatial patterns or clusters of restaurants — meaning groups
+     of restaurants that are concentrated in particular cities, regions, or
+     geographic zones — and explain what those patterns reveal about the market.
+
+------------------------------------------------------------------------------
+WHY IS THIS TASK IMPORTANT?
+------------------------------------------------------------------------------
+
+Geographic analysis of business locations provides critical intelligence for:
+
+  • Market sizing — Understanding where the most restaurants are concentrated
+    tells analysts where competition is highest and where the market is mature.
+
+  • Expansion planning — Identifying regions with relatively few restaurants
+    helps decision-makers spot underserved markets.
+
+  • Consumer behaviour — Restaurant density reflects where people live, work,
+    and spend, making it a proxy for urban activity patterns.
+
+  • Quality benchmarking — Overlaying ratings onto the map reveals whether
+    high-concentration markets also deliver high quality, or whether density
+    comes at the cost of customer satisfaction.
+
+------------------------------------------------------------------------------
+HOW WAS THE DATASET PREPARED?
+------------------------------------------------------------------------------
+
+The raw dataset contained 9,551 restaurant records with 21 attributes each.
+Before any analysis, three cleaning steps were applied:
+
+  1. SENTINEL REMOVAL — Records where both longitude and latitude were exactly
+     (0, 0) were dropped. These are commonly used as placeholder values when
+     actual coordinates are unknown and would incorrectly anchor restaurants
+     at the Gulf of Guinea in the Atlantic Ocean.
+
+  2. BOUNDS VALIDATION — Any coordinates outside the valid geographic range
+     (latitude ±90°, longitude ±180°) were removed as data-entry errors.
+
+  3. NULL DROPS — Records missing city name, latitude, or longitude were
+     excluded since they cannot contribute to spatial analysis.
+
+After cleaning, 9,052 valid records remained across 141 cities in 15 countries.
+
+------------------------------------------------------------------------------
+WHAT ANALYTICAL METHODS WERE USED?
+------------------------------------------------------------------------------
+
+METHOD 1 — COORDINATE SCATTER MAPPING
+  Every restaurant was plotted as a point on a world coordinate grid (longitude
+  on the x-axis, latitude on the y-axis). Each point was colour-coded by its
+  aggregate customer rating using the "plasma" colour scale (dark purple = low
+  rating, bright yellow = high rating). This immediately reveals where
+  restaurants are geographically concentrated.
+
+METHOD 2 — DBSCAN SPATIAL CLUSTERING
+  DBSCAN (Density-Based Spatial Clustering of Applications with Noise) is an
+  algorithm that groups nearby data points into clusters without requiring the
+  number of clusters to be specified in advance. It works by:
+
+  • Converting decimal-degree coordinates to radians (required for the
+    haversine distance metric, which measures distances on a sphere rather
+    than a flat plane).
+
+  • Scanning the dataset with a 50 km search radius (epsilon). Any restaurant
+    within 50 km of at least 30 other restaurants is considered part of a
+    dense region.
+
+  • Labelling restaurants that are not within any dense region as "noise"
+    (isolated or standalone locations).
+
+  The algorithm found 4 distinct geographic clusters and 1,423 noise points.
+
+METHOD 3 — CITY-LEVEL DEEP DIVE
+  The five cities with the most restaurants (New Delhi, Gurgaon, Noida,
+  Faridabad, Ghaziabad) were examined individually with scatter plots.
+  Restaurants within each city were plotted and coloured by rating, revealing
+  spatial rating gradients within each urban area.
+
+METHOD 4 — CONVEX HULL BOUNDARY MAPPING
+  A convex hull is the smallest polygon that encloses all points in a set.
+  Drawing convex hulls around the top-6 clusters clearly shows the geographic
+  footprint (physical area) covered by each cluster, making it easy to
+  compare their spatial extents.
+
+METHOD 5 — STATISTICAL DASHBOARDS
+  Bar charts, scatter plots, and histograms were produced to summarise:
+  • Cluster sizes (restaurant count per cluster)
+  • Cluster quality (average rating per cluster)
+  • Price range versus customer rating relationship
+  • Top 10 most common cuisine types globally
+
+------------------------------------------------------------------------------
+WHAT WERE THE FINDINGS?
+------------------------------------------------------------------------------
+
+FINDING 1 — HEAVY GEOGRAPHIC CONCENTRATION IN SOUTH ASIA
+  New Delhi alone accounts for approximately 57% of all records. The entire
+  National Capital Region (NCR), which includes New Delhi, Gurgaon, Noida,
+  Faridabad, and Ghaziabad, holds over 70% of the dataset. This reflects
+  either the market's genuine size or a data collection bias toward South Asian
+  sources. Either way, the NCR is the dominant geographic market in this dataset.
+
+FINDING 2 — FOUR DISTINCT SPATIAL CLUSTERS
+  DBSCAN identified four clusters at a 50 km search radius:
+  • Cluster 0: NCR Core (New Delhi) — largest and densest
+  • Cluster 1: NCR Suburbs (Gurgaon / Noida) — adjacent to Cluster 0
+  • Cluster 2: Southeast Asia (Manila) — second-largest international cluster
+  • Cluster 3: Europe / International — smaller cluster with high average ratings
+
+  The remaining 1,423 isolated restaurants are spread across cities in the
+  United Kingdom, United States, Canada, New Zealand, Australia, South Africa,
+  Brazil, Turkey, Sri Lanka, and the UAE.
+
+FINDING 3 — PREMIUM ESTABLISHMENTS RATE HIGHER
+  Analysing average customer rating by price tier reveals a clear positive
+  correlation. Restaurants in Price Range 4 (luxury) receive consistently
+  higher ratings than those in Price Range 1 (budget). This suggests that
+  customers either have higher satisfaction at premium venues, or that they are
+  more generous with ratings when spending more.
+
+FINDING 4 — CUISINE DOMINANCE REFLECTS MARKET ORIGIN
+  North Indian cuisine is the most frequently occurring cuisine type, followed
+  by Chinese and Fast Food. This distribution directly reflects the geographic
+  concentration of the dataset in North Indian urban centres. International
+  markets (Europe, Southeast Asia, Oceania) show greater cuisine diversity,
+  with local specialities representing a larger share of listings.
+
+FINDING 5 — RESTAURANTS CLUSTER AROUND COMMERCIAL ZONES
+  Within individual cities, restaurant coordinates cluster tightly around
+  commercial corridors and central business districts. Residential periphery
+  areas show visibly lower density. This confirms that restaurant operators
+  prioritise high-footfall, commercially active urban zones.
+
+------------------------------------------------------------------------------
+HOW TO INTERPRET THE OUTPUT CHARTS
+------------------------------------------------------------------------------
+
+  01_global_distribution_map.png
+    Look at the density of yellow points (highest ratings) vs purple points.
+    Annotations mark the five most restaurant-dense cities.
+
+  02_dbscan_clustering_map.png
+    Each colour represents one DBSCAN cluster. Grey dots are noise points
+    (isolated restaurants outside any dense zone). Text labels show cluster
+    identifiers and dominant cities.
+
+  03_city_deepdive.png
+    Six panels — five city scatter plots plus a bar chart of top-15 cities.
+    Within each city, warm colours (red/orange) indicate highly-rated areas.
+
+  04_cluster_statistics_dashboard.png
+    Multi-panel dashboard. Top-left bar chart ranks clusters by size. Top-right
+    scatter shows whether larger clusters also have higher ratings. Bottom row
+    shows rating distribution, price-tier analysis, and cuisine breakdown.
+
+  05_convex_hull_boundaries.png
+    The shaded polygons show the geographic "footprint" of each major cluster.
+    Larger polygons indicate clusters spread across wider urban areas.
+
+  06_executive_summary_infographic.png
+    One-page summary suitable for presentations. Contains headline metrics and
+    six key findings in plain language.
+
+  cluster_summary_table.csv
+    Tabular version of the cluster statistics for use in further analysis,
+    pivot tables, or inclusion in reports.
+
+------------------------------------------------------------------------------
+TOOLS & TECHNOLOGIES
+------------------------------------------------------------------------------
+
+  Language      : Python 3.10+
+  Data handling : pandas, numpy
+  Visualisation : matplotlib (with GridSpec, colormaps, annotations)
+  Clustering    : scikit-learn (DBSCAN with ball_tree + haversine)
+  Geometry      : scipy (ConvexHull)
+  Notebook      : Jupyter Notebook (.ipynb) + standalone .py script
+
+------------------------------------------------------------------------------
+END OF TASK EXPLANATION
+==============================================================================
